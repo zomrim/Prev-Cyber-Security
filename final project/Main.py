@@ -67,12 +67,20 @@ def main():
     # treatName(str), treatReason(str), treatArea(str), Doctor(Doctor), Patient(Patient)
     treat1 = Treatment("Ablation (burning)", "Heart arrhythmias", "Left side of chest", doc2, pat1)
     pat1.addTreat(treat1)
+    doc2.addTreat(treat1)
     treat2 = Treatment("Cast on shin to fixate bone", "Broken bone in shin", "Right leg", doc3, pat2)
     pat2.addTreat(treat2)
+    doc3.addTreat(treat2)
     treat3 = Treatment("Annual checkup", "Risk group", "Full body", doc4, pat3)
     pat3.addTreat(treat3)
+    doc4.addTreat(treat3)
     treat4 = Treatment("Final confirmation", "HNPP", "Nervous system", doc1, pat4)
     pat4.addTreat(treat4)
+    doc1.addTreat(treat4)
+    treatmentList.append(treat1)
+    treatmentList.append(treat2)
+    treatmentList.append(treat3)
+    treatmentList.append(treat4)
 
 #################################################################### end of preliminary definitions and beginning of login page definition
 
@@ -135,16 +143,23 @@ def open_Home_page(DocEnt, PassEnt):
             right_frame = tk.Frame(HomePage, bg="light blue", width=width * 0.2)
             right_frame.pack(side="right", fill="y")
             left_frame0 = tk.Frame(HomePage, bg="light green", width=width * 0.85)
-            left_frame0.pack(side="left", fill="y")
+            left_frame0.pack(side="left", fill="both", expand=True)
+
+            def clear_left_frame():
+                for widget in left_frame0.winfo_children():
+                    widget.destroy()
 
             # home page sidebar buttons
+
+##################################################################### begining of add treatment from sidebar menu
+
             # add treatment button
             btn1 = tk.Button(right_frame, text="Add Treatment", width=12, bg="white", command=lambda: left_frame1())
             btn1.pack(pady=10)  # vertical spacing
             def left_frame1():
-                left_frame0.pack_forget()  # hide default left frame 0
-                left_frame1 = tk.Frame(HomePage, bg="light green", width=width * 0.85)
-                left_frame1.pack(side="left", fill="y")
+                clear_left_frame()
+                left_frame1 = tk.Frame(left_frame0, bg="light green")
+                left_frame1.pack(fill="both", expand=True)
 
                 # name of treatment label and entry
                 TName = tk.Label(left_frame1, text="Name of treatment", bg="light blue", fg="black")
@@ -185,11 +200,6 @@ def open_Home_page(DocEnt, PassEnt):
                 #selected_patient = Pvalues[PatSelec.get()]
                 # save details button
                 def save_treatment():
-                    #name = TNameEnt.get()
-                    #reason = TReasonEnt.get()
-                    #area = TAreaEnt.get()
-                    #doctor_obj = searchDoctorByName(doctorList, DocSelec.get())
-                    #patient_obj = searchPatientByName(patientList, PatSelec.get())
 
                     # validation
                     name = TNameEnt.get()
@@ -198,6 +208,8 @@ def open_Home_page(DocEnt, PassEnt):
                     if not name or not reason or not area:
                         messagebox.showerror("Error", "All fields must be filled", parent=left_frame1.winfo_toplevel())
                         return
+                    DocSelec.set(TDoctorEnt.get())
+                    PatSelec.set(TPatientEnt.get())
                     doctor = Dvalues.get(DocSelec.get())
                     patient = Pvalues.get(PatSelec.get())
 
@@ -219,10 +231,51 @@ def open_Home_page(DocEnt, PassEnt):
             # Treatment.__init__(TNameEnt, TReasonEnt, TAreaEnt, Do, Pa)
             # treatName(str), treatReason(str), treatArea(str), Doctor(Doctor), Patient(Patient)
 
+#################################################################### end of Add treatment menu and begining of treatment History menu
+
             # treatment history button
-            btn2 = tk.Button(right_frame, text="History", width=12, bg="white")
+            btn2 = tk.Button(right_frame, text="History", width=12, bg="white", command=lambda: left_frame2())
             btn2.pack(pady=10)  # vertical spacing
 
+            # History left menu
+            def left_frame2():
+                # clear previous left content
+                clear_left_frame()
+
+                # main container for history screen
+                frame = tk.Frame(left_frame0, bg="light green")
+                frame.pack(fill="both", expand=True)
+                title = tk.Label(frame, text="Treatment History", font=("Arial", 16, "bold"), bg="light green")
+                title.pack(pady=10)
+
+                # filter treatments by logged-in doctor and sort by date (newest first)
+                doctor_treatments = sorted([t for t in treatmentList if t.Doctor == doct], key=lambda t: t.TreatDate, reverse=True)
+
+                if not doctor_treatments:
+                    tk.Label(frame, text="No treatments found.", font=("Arial", 12), bg="light green").pack(pady=20)
+                    return
+
+                # scrolling area
+                canvas = tk.Canvas(frame, bg="light green", highlightthickness=0)
+                scrollbar = tk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+                scroll_frame = tk.Frame(canvas, bg="light green")
+                scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+                canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+                canvas.configure(yscrollcommand=scrollbar.set)
+                canvas.pack(side="left", fill="both", expand=True)
+                scrollbar.pack(side="right", fill="y")
+
+                # show each treatment
+                for t in doctor_treatments:
+                    card = tk.Frame(scroll_frame, bg="white", bd=2, relief="groove")
+                    card.pack(fill="x", padx=20, pady=6)
+                    tk.Label(card, text=f"Date: {t.TreatDate.strftime('%d/%m/%Y')}", font=("Arial", 10, "bold"),
+                            bg="white").pack(anchor="w", padx=10, pady=(5, 0))
+                    tk.Label(card, text=f"Patient: {t.Patient.fullName}", bg="white").pack(anchor="w", padx=10)
+                    tk.Label(card, text=(f"Treatment: {t.TreatName}\n" f"Reason: {t.TreatReason}\n" f"Area: {t.TreatArea}"),
+                            bg="white", justify="left", wraplength=380).pack(anchor="w", padx=10, pady=(0, 5))
+
+            #################################################################### end of treat History menu and begining of Search Patient menu
             # search patient button
             btn3 = tk.Button(right_frame, text="Patients", width=12, bg="white")
             btn3.pack(pady=10)  # vertical spacing
@@ -242,6 +295,9 @@ def open_Home_page(DocEnt, PassEnt):
 
     # if details are incorrect
     messagebox.showerror("Login Failed", "Incorrect ID or password")
+
+
+
 
 
 if __name__ == "__main__":
