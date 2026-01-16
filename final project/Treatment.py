@@ -12,18 +12,18 @@ class Treatment:
     TreatArea = ""
     TreatDate = ""
     Doctor : Doctor
-    #PatientID = ""
     Patient : Patient
 
 
     # treatment methods
     # full initialize
     def __init__(self,treatName, treatReason, treatArea, Doc: Doctor, pat : Patient):
-        self.TreatNum += 1
+        Treatment.TreatNum += 1
+        self.TreatNum = Treatment.TreatNum
         self.TreatName = treatName
-        self.treatReason = treatReason
-        self.treatArea = treatArea
-        self.treatDate = datetime.now() # using datetime library
+        self.TreatReason = treatReason
+        self.TreatArea = treatArea
+        self.TreatDate = datetime.now() # using datetime library
         self.Doctor = Doc
         self.Patient = pat
 
