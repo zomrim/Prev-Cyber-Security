@@ -454,7 +454,7 @@ def build_home_screen(doct, home_frame, show_login):
                              command=save_patient)
         save_btn.place(x=ex, y=y0 + 5 * (row_h + gap) + 10, width=140, height=32)
 
-######################################################################## end of New patient menu and begining of Personal details menu
+######################################################################## end of New patient menu and begining of Prescribe Meds menu
 
     btn5 = tk.Button(
         right_frame,
@@ -532,7 +532,8 @@ def build_home_screen(doct, home_frame, show_login):
             command=prescribe
         ).pack(pady=20)
 
-    ###########################################################################################################################
+############################################################################ end of Prescribe Meds and begining of Personal details
+
     # sidebar button
     btn5 = tk.Button(right_frame, text="Personal details", width=12, bg="white", command=lambda: left_frame5())
     btn5.pack(pady=10)
@@ -633,9 +634,9 @@ def build_home_screen(doct, home_frame, show_login):
     # Log out button
     btn6 = tk.Button(right_frame, text="Log out", width=12, bg="white", command=show_login)
     btn6.pack(pady=10)  # vertical spacing
-
     return
 
+# assist function to register medication used in hospital according to departments
 def init_medications():
     return [
 
