@@ -246,7 +246,7 @@ class ClinicApp(tk.Tk):
             else:
                 messagebox.showerror("Error", msg)
 
-        tk.Button(form, text="Save", bg="#27ae60", fg="white", font=FONT_BUTTON, relief="flat", command=save)
+        tk.Button(form, text="Save", bg="#27ae60", fg="white", font=FONT_BUTTON, relief="flat", command=save).grid(row=4, column=1, sticky="e", pady=20, padx=10)
 
     def view_history(self):
         self.clear_content()
