@@ -10,8 +10,8 @@ class Patient(Human):
     # full initialize method
     def __init__(self, fullName, id, age, height, weight):
         super().__init__(fullName, id, age, height, weight) # call parent function (Human)
-        self.sensitivityL = [None]
-        self.treatHistory = [None]
+        self.sensitivityL = []
+        self.treatHistory = []
 
     # adding a treatment to patient medical history (treatment has already been done)
     def addTreat(self,newTreatment):
