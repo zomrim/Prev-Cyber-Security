@@ -1,3 +1,4 @@
+from datetime import datetime
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
@@ -48,7 +49,6 @@ def build_home_screen(doct, home_frame, show_login):
     # clear home_frame before rebuilding UI (important when switching doctors)
     for w in home_frame.winfo_children():
         w.destroy()
-    home_btn = None
 
     # home page definition
     width = 500
@@ -58,10 +58,15 @@ def build_home_screen(doct, home_frame, show_login):
     home_frame.configure(bg="light grey")
     top_frame = tk.Frame(home_frame, bg="orange", height=int(height * 0.1))
     top_frame.pack(fill="x")
-    
-    greet_label = tk.Label(home_frame, text=f"Welcome Doctor {doct.fullName}", font=("Cascadia", 16, "bold"))
+
+    greet_label = tk.Label(
+        home_frame,
+        text=f"Welcome Doctor {doct.fullName}",
+        font=("Cascadia", 16, "bold"),
+        bg="orange"
+    )
     greet_label.place(x=40, y=10)
-    
+
     right_frame = tk.Frame(home_frame, bg="light blue", width=int(width * 0.2))
     right_frame.pack(side="right", fill="y")
 
@@ -71,21 +76,91 @@ def build_home_screen(doct, home_frame, show_login):
     def clear_left_frame():
         for widget in left_frame0.winfo_children():
             widget.destroy()
-    
-    def show_home_left():
+
+    # ---------- HOME BUTTON SYSTEM (ONE BUTTON ONLY) ----------
+    home_btn = None
+
+    def hide_home_button():
+        nonlocal home_btn
+        if home_btn is not None:
+            home_btn.place_forget()
+
+    def left_frame_home():
         clear_left_frame()
+        hide_home_button()
+
         frame = tk.Frame(left_frame0, bg="light green")
         frame.pack(fill="both", expand=True)
 
-        # זה המסך הראשי שלך אחרי התחברות (אפשר לשנות טקסט)
-        tk.Label(frame, text="Home", font=("Arial", 18, "bold"), bg="light green").place(x=190, y=40)
-        tk.Label(frame, text="Choose an option from the menu", font=("Arial", 12), bg="light green").place(x=145, y=90)
+        today = datetime.now().date()
 
-    def add_home_button(frame):
-        # יופיע למעלה-שמאל בתוך המסך הירוק
-        home_btn = tk.Button(frame, text="HOME", bg="white", command=show_home_left)
-        home_btn.place(x=10, y=10, width=70, height=28)
-    
+        my_treatments = [t for t in treatmentList if t.Doctor == doct]
+        my_treatments_today = [t for t in my_treatments if t.TreatDate.date() == today]
+
+        # unique patients for this doctor
+        treated_ids = set()
+        treated_patients = []
+        for t in my_treatments:
+            p = t.Patient
+            if p.id not in treated_ids:
+                treated_ids.add(p.id)
+                treated_patients.append(p)
+
+        # patients in system not treated yet by this doctor
+        waiting_count = sum(1 for p in patientList if p.id not in treated_ids)
+
+        # last activity
+        last_text = "No treatments yet."
+        if my_treatments:
+            last_t = max(my_treatments, key=lambda x: x.TreatDate)
+            last_text = f"{last_t.TreatDate.strftime('%d/%m %H:%M')} - {last_t.Patient.fullName}"
+
+        # title
+        tk.Label(frame, text="Control Panel", font=("Arial", 18, "bold"), bg="light green").place(x=150, y=15)
+        tk.Label(frame, text=f"Today: {datetime.now().strftime('%d/%m/%Y')}",
+                font=("Arial", 11), bg="light green").place(x=185, y=45)
+
+        # helper to draw a "card"
+        def card(x, y, title_txt, value_txt, w=200, h=80, big_font=18):
+            c = tk.Frame(frame, bg="white", bd=2, relief="groove")
+            c.place(x=x, y=y, width=w, height=h)
+
+            tk.Label(c, text=title_txt, font=("Arial", 10, "bold"), bg="white").pack(pady=(10, 0))
+            tk.Label(
+                c,
+                text=value_txt,
+                font=("Arial", big_font, "bold"),
+                bg="white",
+                wraplength=w - 20,
+                justify="center"
+            ).pack(pady=(6, 0))
+
+        # --- cards layout (fits 500x500) ---
+        # row 1
+        card(30, 90,  "Treatments Today", str(len(my_treatments_today)), w=200, h=80)
+        card(260, 90, "My Patients", str(len(treated_patients)), w=200, h=80)
+
+        # row 2
+        card(30, 185, "Patients Not Treated Yet", str(waiting_count), w=200, h=80)
+
+        # last activity needs a bit more height and smaller font (text is longer)
+        card(260, 185, "Last Activity", last_text, w=200, h=90, big_font=11)
+
+        # recent treatments (last 5)
+        tk.Label(frame, text="Recent Treatments (last 5)", font=("Arial", 11, "bold"),
+                bg="light green").place(x=30, y=300)
+
+        recent = sorted(my_treatments, key=lambda x: x.TreatDate, reverse=True)[:5]
+        y = 330
+
+        if not recent:
+            tk.Label(frame, text="No treatments yet.", bg="light green").place(x=30, y=y)
+        else:
+            for t in recent:
+                txt = f"{t.TreatDate.strftime('%d/%m %H:%M')} | {t.Patient.fullName} | {t.TreatName}"
+                tk.Label(frame, text=txt, bg="light green", anchor="w", font=("Arial", 10)).place(x=30, y=y, width=440)
+                y += 22
+
     def show_home_button():
         nonlocal home_btn
         if home_btn is None:
@@ -95,30 +170,22 @@ def build_home_screen(doct, home_frame, show_login):
                 bg="orange",
                 fg="black",
                 font=("Arial", 10, "bold"),
-                command=go_home
-            )
-            home_btn.place(
-                relx=0.95,  # צד ימין
-                y=8,
-                anchor="ne",
-                width=70,
-                height=28
+                command=left_frame_home
             )
 
+        # צד ימין למעלה בתוך הפס הכתום
+        home_btn.place(relx=0.97, y=8, anchor="ne", width=70, height=28)
 
-    def hide_home_button():
-        nonlocal home_btn
-        if home_btn is not None:
-            home_btn.destroy()
-            home_btn = None
-    def go_home():
-        clear_left_frame()
-        hide_home_button()
-        # אופציונלי: מה יופיע במסך הראשי כשחוזרים
-        tk.Label(left_frame0, text="Home", font=("Arial", 18, "bold"), bg="light green").pack(pady=40)
+    # --- תזכורת שימוש:
+    # בתוך כל left_frameX שהוא לא הבית -> תוסיף show_home_button()
+    # בתוך left_frame_home() -> יש hide_home_button()
 
-    # home page sidebar buttons
+    # ---- כאן בהמשך יבואו כפתורי ה-sidebar וה-left_frame1/2/3... שלך ----
 
+    # חשוב: כשנכנסים למערכת, תציג ישר את מסך הבית
+    left_frame_home()
+
+    
     ##################################################################### begining of add treatment from sidebar menu
 
     # add treatment button
@@ -541,7 +608,7 @@ def main():
     # login page definition (SINGLE WINDOW)
     root = tk.Tk()
     root.title("Clinic System")
-    root.geometry("500x500+10+20")
+    root.geometry("600x500+10+20")
     root.configure(bg="white")
 
     # two screens in same window
