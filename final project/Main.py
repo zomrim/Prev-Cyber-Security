@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
@@ -773,8 +774,9 @@ def main():
     login_frame.pack(fill="both", expand=True)
 
     # login page design
-    logimg = Image.open(r"C:\Users\USER\Desktop\C programs\first semester fourth year - prev syber security\final project\LoginPage_image.png")
-
+    script_dir = os.path.dirname(__file__)
+    image_path = os.path.join(script_dir, "LoginPage_image.png")
+    logimg = Image.open(image_path)
     logimg = logimg.resize((220, 220))
     welcome_logo = ImageTk.PhotoImage(logimg)
     img_label = tk.Label(login_frame, image=welcome_logo, borderwidth=0, bg="white")
