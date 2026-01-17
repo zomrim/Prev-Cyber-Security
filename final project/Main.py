@@ -59,24 +59,32 @@ def build_home_screen(doct, home_frame, show_login):
     height = 500
 
     # Home page design
-    home_frame.configure(bg="light grey")
-    top_frame = tk.Frame(home_frame, bg="orange", height=int(height * 0.1))
-    top_frame.pack(fill="x")
+    # Home page design - Modern Medical Theme
+    bg_color = "#f0f2f5"       # אפור בהיר מאוד לרקע כללי
+    sidebar_color = "#2c3e50"  # כחול כהה לתפריט צד
+    header_color = "white"     # לבן לכותרת
+    
+    home_frame.configure(bg=bg_color)
+    
+    # כותרת עליונה נקייה
+    top_frame = tk.Frame(home_frame, bg=header_color, height=70, bd=1, relief="solid")
+    top_frame.pack(side="top", fill="x")
 
     greet_label = tk.Label(
-        home_frame,
-        text=f"Welcome Doctor {doct.fullName}",
-        font=("Cascadia", 16, "bold"),
-        bg="orange"
+        top_frame,
+        text=f"Medical Portal | Dr. {doct.fullName}",
+        font=("Sans Serif", 14), # שימוש בפונט מודרני יותר
+        bg=header_color,
+        fg="#333333"
     )
-    greet_label.place(x=40, y=10)
+    greet_label.place(x=30, y=20)
 
-    # sidebar menu
-    right_frame = tk.Frame(home_frame, bg="light blue", width=int(width * 0.2))
+    # תפריט צד כהה
+    right_frame = tk.Frame(home_frame, bg=sidebar_color, width=200)
     right_frame.pack(side="right", fill="y")
 
-    # details request and information menu
-    left_frame0 = tk.Frame(home_frame, bg="light green", width=int(width * 0.85))
+    # מסגרת ראשית לתוכן
+    left_frame0 = tk.Frame(home_frame, bg=bg_color)
     left_frame0.pack(side="left", fill="both", expand=True)
 
     # leave one page to the other
@@ -126,24 +134,31 @@ def build_home_screen(doct, home_frame, show_login):
             last_text = f"{last_t.TreatDate.strftime('%d/%m %H:%M')} - {last_t.Patient.fullName}"
 
         # home page title
-        tk.Label(frame, text="Control Panel", font=("Arial", 18, "bold"), bg="light green").place(x=150, y=15)
+        tk.Label(frame, text="Control Panel", font=("Sans Serif", 18, "bold"), bg="light green").place(x=150, y=15)
         tk.Label(frame, text=f"Today: {datetime.now().strftime('%d/%m/%Y')}",
-                 font=("Arial", 11), bg="light green").place(x=185, y=45)
+                 font=("Sans Serif", 11), bg="light green").place(x=185, y=45)
 
         # draw a "card" helper. cards contain details
-        def card(x, y, title_txt, value_txt, w=200, h=80, big_font=18):
-            c = tk.Frame(frame, bg="white", bd=2, relief="groove")
+        def card(x, y, title_txt, value_txt, w=200, h=90, big_font=20):
+            # כרטיס לבן עם מסגרת עדינה
+            c = tk.Frame(frame, bg="white", bd=0, highlightbackground="#d1d5db", highlightthickness=1)
             c.place(x=x, y=y, width=w, height=h)
 
-            tk.Label(c, text=title_txt, font=("Arial", 10, "bold"), bg="white").pack(pady=(10, 0))
+            # פס צבעוני בצד שמאל (Accent)
+            tk.Frame(c, bg="#3498db", width=5).pack(side="left", fill="y")
+            
+            # קונטיינר לטקסט
+            content = tk.Frame(c, bg="white")
+            content.pack(side="left", fill="both", expand=True, padx=12, pady=8)
+
+            tk.Label(content, text=title_txt, font=("Sans Serif", 9, "bold"), fg="#7f8c8d", bg="white").pack(anchor="w")
             tk.Label(
-                c,
+                content,
                 text=value_txt,
-                font=("Arial", big_font, "bold"),
-                bg="white",
-                wraplength=w - 20,
-                justify="center"
-            ).pack(pady=(6, 0))
+                font=("Sans Serif", big_font, "bold"),
+                fg="#2c3e50", # כחול כהה למספרים
+                bg="white"
+            ).pack(anchor="w", pady=(2, 0))
 
         # --- cards layout (fits 500x500) ---
         # row 1
@@ -157,7 +172,7 @@ def build_home_screen(doct, home_frame, show_login):
         card(260, 185, "Last Activity", last_text, w=200, h=90, big_font=11)
 
         # recent treatments (last 5)
-        tk.Label(frame, text="Recent Treatments (last 5)", font=("Arial", 11, "bold"),
+        tk.Label(frame, text="Recent Treatments (last 5)", font=("Sans Serif", 11, "bold"),
                  bg="light green").place(x=30, y=300)
 
         recent = sorted(my_treatments, key=lambda x: x.TreatDate, reverse=True)[:5]
@@ -168,7 +183,7 @@ def build_home_screen(doct, home_frame, show_login):
         else:
             for t in recent:
                 txt = f"{t.TreatDate.strftime('%d/%m %H:%M')} | {t.Patient.fullName} | {t.TreatName}"
-                tk.Label(frame, text=txt, bg="light green", anchor="w", font=("Arial", 10)).place(x=30, y=y, width=440)
+                tk.Label(frame, text=txt, bg="light green", anchor="w", font=("Sans Serif", 10)).place(x=30, y=y, width=440)
                 y += 22
 
     # show when not on home page
@@ -180,7 +195,7 @@ def build_home_screen(doct, home_frame, show_login):
                 text="HOME",
                 bg="orange",
                 fg="black",
-                font=("Arial", 10, "bold"),
+                font=("Sans Serif", 10, "bold"),
                 command=left_frame_home
             )
 
@@ -204,7 +219,7 @@ def build_home_screen(doct, home_frame, show_login):
         TDoctor = tk.Label(left_frame1, text="Attending physician", bg="light blue", fg="black")
         TDoctor.place(x=10, y=10, width=width * 0.3, height=height * 0.08)
 
-        DoctorEnt = tk.Entry(left_frame1, bg="light grey", fg="black", font=("Arial", 12))
+        DoctorEnt = tk.Entry(left_frame1, bg="light grey", fg="black", font=("Sans Serif", 12))
         DoctorEnt.place(x=150, y=10, width=width * 0.4, height=height * 0.08)
         DoctorEnt.insert(0, doct.fullName)
         DoctorEnt.config(state="readonly")
@@ -223,21 +238,21 @@ def build_home_screen(doct, home_frame, show_login):
         TName = tk.Label(left_frame1, text="Name of treatment", bg="light blue", fg="black")
         TName.place(x=10, y=150, width=width * 0.3, height=height * 0.08)
 
-        TNameEnt = tk.Entry(left_frame1, bg="light blue", fg="black", font=("Arial", 12))
+        TNameEnt = tk.Entry(left_frame1, bg="light blue", fg="black", font=("Sans Serif", 12))
         TNameEnt.place(x=150, y=150, width=width * 0.4, height=height * 0.08)
 
         # Row 4: Reason
         TReason = tk.Label(left_frame1, text="Reason for treatment", bg="light blue", fg="black")
         TReason.place(x=10, y=220, width=width * 0.3, height=height * 0.08)
 
-        TReasonEnt = tk.Entry(left_frame1, bg="light blue", fg="black", font=("Arial", 12))
+        TReasonEnt = tk.Entry(left_frame1, bg="light blue", fg="black", font=("Sans Serif", 12))
         TReasonEnt.place(x=150, y=220, width=width * 0.4, height=height * 0.08)
 
         # Row 5: Area
         TArea = tk.Label(left_frame1, text="Treatment area", bg="light blue", fg="black")
         TArea.place(x=10, y=290, width=width * 0.3, height=height * 0.08)
 
-        TAreaEnt = tk.Entry(left_frame1, bg="light blue", fg="black", font=("Arial", 12))
+        TAreaEnt = tk.Entry(left_frame1, bg="light blue", fg="black", font=("Sans Serif", 12))
         TAreaEnt.place(x=150, y=290, width=width * 0.4, height=height * 0.08)
 
         # save details button
@@ -290,7 +305,7 @@ def build_home_screen(doct, home_frame, show_login):
         frame = tk.Frame(left_frame0, bg="light green")
         frame.pack(fill="both", expand=True)
         show_home_button()
-        title = tk.Label(frame, text="Treatment History", font=("Arial", 16, "bold"), bg="light green")
+        title = tk.Label(frame, text="Treatment History", font=("Sans Serif", 16, "bold"), bg="light green")
         title.pack(pady=10)
 
         # filter treatments by logged-in doctor and sort by date (newest first)
@@ -298,7 +313,7 @@ def build_home_screen(doct, home_frame, show_login):
                                    reverse=True)
 
         if not doctor_treatments:
-            tk.Label(frame, text="No treatments found.", font=("Arial", 12), bg="light green").pack(pady=20)
+            tk.Label(frame, text="No treatments found.", font=("Sans Serif", 12), bg="light green").pack(pady=20)
             return
 
         # scrolling area
@@ -315,7 +330,7 @@ def build_home_screen(doct, home_frame, show_login):
         for t in doctor_treatments:
             card = tk.Frame(scroll_frame, bg="white", bd=2, relief="groove")
             card.pack(fill="x", padx=20, pady=6)
-            tk.Label(card, text=f"Date: {t.TreatDate.strftime('%d/%m/%Y')}", font=("Arial", 10, "bold"),
+            tk.Label(card, text=f"Date: {t.TreatDate.strftime('%d/%m/%Y')}", font=("Sans Serif", 10, "bold"),
                      bg="white").pack(anchor="w", padx=10, pady=(5, 0))
             tk.Label(card, text=f"Patient: {t.Patient.fullName}", bg="white").pack(anchor="w", padx=10)
             tk.Label(card, text=(f"Treatment: {t.TreatName}\n" f"Reason: {t.TreatReason}\n" f"Area: {t.TreatArea}"),
@@ -333,7 +348,7 @@ def build_home_screen(doct, home_frame, show_login):
         frame = tk.Frame(left_frame0, bg="light green")
         frame.pack(fill="both", expand=True)
         show_home_button()
-        title = tk.Label(frame, text="My Patients", font=("Arial", 16, "bold"), bg="light green")
+        title = tk.Label(frame, text="My Patients", font=("Sans Serif", 16, "bold"), bg="light green")
         title.pack(pady=10)
 
         # pull all patients treated by the logged-in doctor (no duplicates)
@@ -348,7 +363,7 @@ def build_home_screen(doct, home_frame, show_login):
                     doctor_patients.append(p)
 
         if not doctor_patients:
-            tk.Label(frame, text="No patients found for this doctor.", font=("Arial", 12), bg="light green").pack(
+            tk.Label(frame, text="No patients found for this doctor.", font=("Sans Serif", 12), bg="light green").pack(
                 pady=20)
             return
 
@@ -368,7 +383,7 @@ def build_home_screen(doct, home_frame, show_login):
             card = tk.Frame(scroll_frame, bg="white", bd=2, relief="groove")
             card.pack(fill="x", padx=20, pady=6)
 
-            tk.Label(card, text=p.fullName, font=("Arial", 12, "bold"), bg="white").pack(anchor="w", padx=10,
+            tk.Label(card, text=p.fullName, font=("Sans Serif", 12, "bold"), bg="white").pack(anchor="w", padx=10,
                                                                                          pady=(5, 0))
             tk.Label(card, text=f"ID: {p.id}", bg="white").pack(anchor="w", padx=10)
             tk.Label(card, text=f"Age: {p.age} | Height: {p.height} | Weight: {p.weight}", bg="white").pack(anchor="w",
@@ -387,7 +402,7 @@ def build_home_screen(doct, home_frame, show_login):
         frame = tk.Frame(left_frame0, bg="light green")
         frame.pack(fill="both", expand=True)
         show_home_button()
-        title = tk.Label(frame, text="New Patient", font=("Arial", 16, "bold"), bg="light green")
+        title = tk.Label(frame, text="New Patient", font=("Sans Serif", 16, "bold"), bg="light green")
         title.place(x=160, y=20)
 
         # layout
@@ -402,11 +417,11 @@ def build_home_screen(doct, home_frame, show_login):
             ent.place(x=ex, y=y, width=entry_w, height=row_h)
 
         # entries
-        name_ent = tk.Entry(frame, font=("Arial", 12), bg="white")
-        id_ent = tk.Entry(frame, font=("Arial", 12), bg="white")
-        age_ent = tk.Entry(frame, font=("Arial", 12), bg="white")
-        h_ent = tk.Entry(frame, font=("Arial", 12), bg="white")
-        w_ent = tk.Entry(frame, font=("Arial", 12), bg="white")
+        name_ent = tk.Entry(frame, font=("Sans Serif", 12), bg="white")
+        id_ent = tk.Entry(frame, font=("Sans Serif", 12), bg="white")
+        age_ent = tk.Entry(frame, font=("Sans Serif", 12), bg="white")
+        h_ent = tk.Entry(frame, font=("Sans Serif", 12), bg="white")
+        w_ent = tk.Entry(frame, font=("Sans Serif", 12), bg="white")
 
         row(0, "Full Name", name_ent)
         row(1, "Patient ID", id_ent)
@@ -451,7 +466,7 @@ def build_home_screen(doct, home_frame, show_login):
             h_ent.delete(0, tk.END)
             w_ent.delete(0, tk.END)
 
-        save_btn = tk.Button(frame, text="Save Patient", bg="light green", font=("Arial", 12, "bold"),
+        save_btn = tk.Button(frame, text="Save Patient", bg="light green", font=("Sans Serif", 12, "bold"),
                              command=save_patient)
         save_btn.place(x=ex, y=y0 + 5 * (row_h + gap) + 10, width=140, height=32)
 
@@ -476,7 +491,7 @@ def build_home_screen(doct, home_frame, show_login):
         tk.Label(
             frame,
             text="Prescription Medications",
-            font=("Cascadia", 16, "bold"),
+            font=("Sans Serif", 16, "bold"),
             bg="light green"
         ).pack(pady=(30,20),padx=(20,20))
 
@@ -529,7 +544,7 @@ def build_home_screen(doct, home_frame, show_login):
             frame,
             text="Prescribe",
             bg="light blue",
-            font=("Arial", 12, "bold"),
+            font=("Sans Serif", 12, "bold"),
             command=prescribe
         ).pack(pady=20)
 
@@ -546,7 +561,7 @@ def build_home_screen(doct, home_frame, show_login):
         frame = tk.Frame(left_frame0, bg="light green")
         frame.pack(fill="both", expand=True)
         show_home_button()
-        title = tk.Label(frame, text="Personal Details", font=("Arial", 16, "bold"), bg="light green")
+        title = tk.Label(frame, text="Personal Details", font=("Sans Serif", 16, "bold"), bg="light green")
         title.place(x=120, y=20)
 
         # --- fixed layout for 500x500 ---
@@ -575,15 +590,15 @@ def build_home_screen(doct, home_frame, show_login):
         confirm_pass_var = tk.StringVar(value="")
 
         # Widgets
-        name_ent = tk.Entry(frame, textvariable=name_var, font=("Arial", 12), bg="white")
-        id_ent = tk.Entry(frame, textvariable=id_var, font=("Arial", 12), bg="light grey", state="readonly")
-        age_ent = tk.Entry(frame, textvariable=age_var, font=("Arial", 12), bg="white")
-        h_ent = tk.Entry(frame, textvariable=h_var, font=("Arial", 12), bg="white")
-        w_ent = tk.Entry(frame, textvariable=w_var, font=("Arial", 12), bg="white")
-        spec_ent = tk.Entry(frame, textvariable=spec_var, font=("Arial", 12), bg="white")
+        name_ent = tk.Entry(frame, textvariable=name_var, font=("Sans Serif", 12), bg="white")
+        id_ent = tk.Entry(frame, textvariable=id_var, font=("Sans Serif", 12), bg="light grey", state="readonly")
+        age_ent = tk.Entry(frame, textvariable=age_var, font=("Sans Serif", 12), bg="white")
+        h_ent = tk.Entry(frame, textvariable=h_var, font=("Sans Serif", 12), bg="white")
+        w_ent = tk.Entry(frame, textvariable=w_var, font=("Sans Serif", 12), bg="white")
+        spec_ent = tk.Entry(frame, textvariable=spec_var, font=("Sans Serif", 12), bg="white")
 
-        new_pass_ent = tk.Entry(frame, textvariable=new_pass_var, font=("Arial", 12), bg="white", show="*")
-        confirm_pass_ent = tk.Entry(frame, textvariable=confirm_pass_var, font=("Arial", 12), bg="white", show="*")
+        new_pass_ent = tk.Entry(frame, textvariable=new_pass_var, font=("Sans Serif", 12), bg="white", show="*")
+        confirm_pass_ent = tk.Entry(frame, textvariable=confirm_pass_var, font=("Sans Serif", 12), bg="white", show="*")
 
         # Place rows (0..7)
         row(0, "Full Name", name_ent)
@@ -627,7 +642,7 @@ def build_home_screen(doct, home_frame, show_login):
         # Save button - placed AFTER last row (no overlap)
         last_y = y0 + 7 * (row_h + gap)
         save_y = last_y + row_h + 12
-        save_btn = tk.Button(frame, text="Save", bg="light green", font=("Arial", 12, "bold"), command=save_details)
+        save_btn = tk.Button(frame, text="Save", bg="light green", font=("Sans Serif", 12, "bold"), command=save_details)
         save_btn.place(x=ex, y=save_y, width=120, height=32)
 
 ########################################################################################### end of Personal details menu
@@ -786,13 +801,13 @@ def main():
     # request doctor ID and placing
     DocId = tk.Label(login_frame, text="Doctor ID", bg="light blue", fg="black")
     DocId.place(x=100, y=300)
-    DocEnt = tk.Entry(login_frame, bg="light blue", fg="black", font=("Arial", 12))
+    DocEnt = tk.Entry(login_frame, bg="light blue", fg="black", font=("Sans Serif", 12))
     DocEnt.place(x=200, y=300)
 
     # request doctor personal password and placing
     DocPass = tk.Label(login_frame, text="Password", bg="light blue", fg="black")
     DocPass.place(x=100, y=340)
-    PassEnt = tk.Entry(login_frame, bg="light blue", fg="black", font=("Arial", 12), show="*")
+    PassEnt = tk.Entry(login_frame, bg="light blue", fg="black", font=("Sans Serif", 12), show="*")
     PassEnt.place(x=200, y=340)
 
     # screen navigation
@@ -813,7 +828,7 @@ def main():
         text="Enter",
         bg="light green",
         fg="black",
-        font=("Arial", 12, "bold"),
+        font=("Sans Serif", 12, "bold"),
         command=lambda: try_login(DocEnt.get(), PassEnt.get(), show_home)
     )
     EntButton.place(x=220, y=400)
