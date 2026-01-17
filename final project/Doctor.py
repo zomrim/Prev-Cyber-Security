@@ -1,6 +1,7 @@
 from Patient import Patient
+from Staff import Staff
 
-class Doctor(Patient):
+class Doctor(Patient, Staff):
 
     # Doctor attributes
     speciality = ""
@@ -10,8 +11,9 @@ class Doctor(Patient):
     password = ""
 
     # full initialize method
-    def __init__(self,fullName, id, age, height, weight, speciality, password):
-        super().__init__(fullName, id, age, height, weight)
+    def __init__(self,fullName, id, age, height, weight, speciality, password, employee_id, salary):
+        Patient.__init__(self, fullName, id, age, height, weight)
+        Staff.__init__(self, employee_id, salary)
         self.speciality = speciality
         self.isActive = True
         self.treatHistory = []

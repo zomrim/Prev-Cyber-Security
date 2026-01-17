@@ -5,6 +5,7 @@ class Patient(Human):
     # Patient attributes
     sensitivityL = []
     treatHistory = []
+    medications = []
 
     # attributes are lists that are defined in the initialize function
     # full initialize method
@@ -12,6 +13,7 @@ class Patient(Human):
         super().__init__(fullName, id, age, height, weight) # call parent function (Human)
         self.sensitivityL = []
         self.treatHistory = []
+        self.medications = []
 
     # adding a treatment to patient medical history (treatment has already been done)
     def addTreat(self,newTreatment):
@@ -21,4 +23,8 @@ class Patient(Human):
     def addS(self, newSensitivity):
         self.sensitivityL.append(newSensitivity)
 
-# remove sensitiviy
+    def addMedication(self, med):
+        self.medications.append(med)
+
+    def removeSensitivity(self, sensitivity):
+        self.sensitivityL.remove(sensitivity)

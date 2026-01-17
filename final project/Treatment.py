@@ -33,3 +33,10 @@ class Treatment:
         return ("treatment name: " + self.TreatName + ", reason for treatment: " + self.TreatReason +
                 ", limb or area that received treatment: " + self.TreatArea + ", treatment Date: " + self.TreatDate +
                 ", name of doctor: " + self.Doctor.fullName + ", patient name: " + self.Patient.fullName)
+    
+    def days_passed(self):
+        delta = datetime.now() - self.TreatDate
+        return delta.days
+    
+    def is_today(self):
+        return self.TreatDate.date() == datetime.now().date()

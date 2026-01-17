@@ -17,3 +17,8 @@ class Medication:
             f"Purpose: {self.MedPurpos}"
         )
 
+    def update_dosage(self, new_daily_dose):
+        if new_daily_dose > 0:
+            self.MedDaily = new_daily_dose
+            return True
+        return False
